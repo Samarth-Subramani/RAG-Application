@@ -1,2 +1,2 @@
-huggingface_key="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"
+huggingface_key=""
 hf_token=""
