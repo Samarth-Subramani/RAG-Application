@@ -13,20 +13,18 @@ DATA_PATH = "Data"
 CHROMA_PATH= "chroma"
 
 def main():
-    #check if the database should be cleared (using --clear flag).
+    #check if the database should be cleared
     parser = argparse.ArgumentParser()
     parser.add_argument("--reset", action="store_true", help="Reset the database.")
     args= parser.parse_args()
     if args.reset:
-        print("✨Clearning Database")
+        print("Clearning Database")
         clear_database()
 
     #creating or updating the data store.
     documents= load_documents()
     chunks = split_documents(documents)
     add_to_chroma(chunks)
-
-
 
 def load_documents():
     document_loader= PyPDFDirectoryLoader(DATA_PATH)
@@ -35,7 +33,6 @@ def load_documents():
 def split_documents(documents: list[Document]):
     
     text_splitter = RecursiveCharacterTextSplitter(
-        # Set a really small chunk size, just to show.
         chunk_size=800,
         chunk_overlap=80,
         length_function=len,
@@ -87,12 +84,12 @@ def add_to_chroma(chunks: list[Document]):
             new_chunks.append(chunk)
 
     if len(new_chunks):
-        print(f"👉Adding new documents: {len(new_chunks)}")
+        print(f"Adding new documents: {len(new_chunks)}")
         new_chunk_ids = [chunk.metadata["id"] for chunk in new_chunks]
         db.add_documents(new_chunks, ids=new_chunk_ids)
         db.persist()
     else:
-        print(f"✅no new documents to add")
+        print(f"No new documents to add")
 
 
 def clear_database():
@@ -101,4 +98,5 @@ def clear_database():
 
 
 if __name__ == "__main__":
+
     main()
