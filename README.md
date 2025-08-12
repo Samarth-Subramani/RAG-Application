@@ -56,8 +56,11 @@ python rag_query.py --query ".............?"
 
 optionally
 --k 4                    # number of retrieved chunks
+
 --collection my_docs     # custom collection name
+
 --temperature 0.2        # generation temperature
+
 
 ## Configuration
 
