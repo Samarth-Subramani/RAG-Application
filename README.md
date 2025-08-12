@@ -45,6 +45,7 @@ Drop your files into the Data/ directory.
 ### 4) Build the vector store
 python populate_data.py
 
+
 This will:
 
 Load and chunk texts from Data/
@@ -61,7 +62,7 @@ optionally
 
 --temperature 0.2        # generation temperature
 
-
+---
 ## Configuration
 
 While using:
@@ -71,6 +72,7 @@ Set HUGGINGFACEHUB_API_TOKEN in your environment, or put it in secret_key.py and
 ### Local models: 
 Ensure transformers, accelerate, and the right backend (CPU/GPU) are set up.
 
+---
 ## Model choices
 ### Embeddings: 
 Any Sentence Transformers model works (e.g., all-MiniLM-L6-v2, multi-qa-MiniLM-L6-cos-v1, e5-small-v2, etc.)
@@ -78,18 +80,21 @@ Any Sentence Transformers model works (e.g., all-MiniLM-L6-v2, multi-qa-MiniLM-L
 ### Generator: 
 Choose a HF text-generation model that fits your hardware (e.g., mistralai, llama-8b, etc.). CPU-only? Prefer smaller models.
 
+---
 ## How it works (RAG flow)
 Chunk & Embed – populate_data.py splits your documents and converts them to vectors using get_embedding_function.py.
 Upsert to Chroma – vectors + metadata are stored locally under ./chroma.
 Retrieve – rag_query.py encodes your query and retrieves the top-k nearest chunks.
 Generate – the retrieved context is fed to a HF LLM to produce a grounded answer.
 
+---
 ## Troubleshooting
 No results / empty answers: verify you ran populate_data.py after adding files to Data/.
 Slow generation: switch to a smaller HF model or run with GPU.
 Vector store reset: delete the chroma/ folder and re-run ingestion.
 Model not found: run huggingface-cli login or ensure the model is public.
 
+---
 ## Roadmap
 PDF/HTML loaders with clean text extraction
 Source highlighting in answers
