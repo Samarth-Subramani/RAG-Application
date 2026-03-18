@@ -1,5 +1,11 @@
 # RAG Chat Application (Python + FastAPI + React + ChromaDB + OpenAI)
 
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-green)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/Frontend-React-blue)](https://react.dev/)
+[![ChromaDB](https://img.shields.io/badge/VectorDB-Chroma-purple)](https://www.trychroma.com/)
+[![OpenAI](https://img.shields.io/badge/LLM-OpenAI-black)](https://openai.com/)
+
 &#x20;  &#x20;
 
 ---
