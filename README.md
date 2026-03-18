@@ -1,103 +1,255 @@
-# RAG Application (Hugging Face + ChromaDB)
+# RAG Chat Application (Python + FastAPI + React + ChromaDB + OpenAI)
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/downloads/)
-[![HuggingFace](https://img.shields.io/badge/Models-HuggingFace-orange)](https://huggingface.co/)
-[![ChromaDB](https://img.shields.io/badge/VectorDB-ChromaDB-purple)](https://www.trychroma.com/)
+&#x20;  &#x20;
 
-A minimal, reproducible Retrieval-Augmented Generation (RAG) pipeline built with **Hugging Face** models and **ChromaDB** for embeddings + vector search.
+---
 
-It lets you:
-- Ingest your own documents into a local ChromaDB collection
-- Embed chunks with a Hugging Face embedding model
-- Retrieve top-k relevant chunks for a query
-- Generate grounded answers with a Hugging Face LLM
+## Overview
+
+This is an **end-to-end Retrieval-Augmented Generation (RAG) application** that allows users to:
+
+- Upload PDF documents
+- Automatically ingest them into a vector database
+- Ask questions in a chat interface
+- Get accurate answers grounded in uploaded documents
+
+---
+
+## Architecture
+
+```
+React Frontend  →  FastAPI Backend  →  RAG Pipeline
+                           ↓
+                    Chroma Vector DB
+                           ↓
+                        OpenAI
+```
 
 ---
 
 ## Features
 
-- **Local-first** vector DB with Chroma (no cloud dependency)
-- **Pluggable embeddings** via `get_embedding_function.py`
-- **Simple data ingestion** from the `Data/` folder
-- **RAG querying** with source-aware responses
-- **Pure Python** scripts (plus a demo notebook)
+### Document Handling
+
+- Upload PDF files via UI
+- Automatic ingestion into ChromaDB
+- Chunking + embedding pipeline
+
+### RAG Pipeline
+
+- Semantic search using ChromaDB
+- OpenAI embeddings + LLM
+- Context-aware answer generation
+
+### Chat Interface
+
+- Chat-style UI (user ↔ AI)
+- Left-right message bubbles
+- Loading indicators
+
+### Backend
+
+- FastAPI REST APIs
+- Modular architecture (routes + services)
+- Real-time ingestion pipeline
 
 ---
 
-## Quickstart
+## Tech Stack
 
-### 1) Environment
+### Backend
 
-Python 3.10+ recommended
-python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
+- FastAPI
+- LangChain
+- ChromaDB
+- OpenAI API
 
-pip install -U pip
-pip install -U chromadb sentence-transformers transformers accelerate torch huggingface-hub langchain 
+### Frontend
 
-
-### 2) Configure embeddings
-Open get_embedding_function.py and set your preferred embedding model
-
-### 3) Add your data
-Drop your files into the Data/ directory.
-
-### 4) Build the vector store
-python populate_data.py
-
-
-This will:
-
-Load and chunk texts from Data/
-Compute embeddings
-Store them in a local Chroma collection under ./chroma
-
-### 5) Ask questions (RAG)
-python rag_query.py --query ".............?"
-
-optionally
---k 4                    # number of retrieved chunks
-
---collection my_docs     # custom collection name
-
---temperature 0.2        # generation temperature
+- React (Vite)
+- Fetch API
 
 ---
-## Configuration
 
-While using:
+## Project Structure
 
-### Hugging Face Inference API: 
-Set HUGGINGFACEHUB_API_TOKEN in your environment, or put it in secret_key.py and import it where needed.
-### Local models: 
-Ensure transformers, accelerate, and the right backend (CPU/GPU) are set up.
-
----
-## Model choices
-### Embeddings: 
-Any Sentence Transformers model works (e.g., all-MiniLM-L6-v2, multi-qa-MiniLM-L6-cos-v1, e5-small-v2, etc.)
-
-### Generator: 
-Choose a HF text-generation model that fits your hardware (e.g., mistralai, llama-8b, etc.). CPU-only? Prefer smaller models.
-
----
-## How it works (RAG flow)
-Chunk & Embed – populate_data.py splits your documents and converts them to vectors using get_embedding_function.py.
-Upsert to Chroma – vectors + metadata are stored locally under ./chroma.
-Retrieve – rag_query.py encodes your query and retrieves the top-k nearest chunks.
-Generate – the retrieved context is fed to a HF LLM to produce a grounded answer.
+```
+RAG-Application/
+│
+├── backend/
+│   ├── app/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   └── utils/
+│   ├── data/        # uploaded PDFs
+│   └── chroma/      # vector DB 
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   └── services/
+│
+└── README.md
+```
 
 ---
+
+## Setup Instructions
+
+### Install uv
+
+```bash
+# Windows
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# macOS/Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### Clone and Install Dependencies
+
+```bash
+git clone <repository-url>
+cd backend
+uv sync --all-extras
+
+# activate environment
+source .venv/bin/activate  # macOS/Linux
+.venv\Scripts\activate  # Windows
+```
+
+### Set OpenAI API Key
+
+```
+export OPENAI_API_KEY="your_api_key_here"
+```
+
+Windows:
+
+```
+set OPENAI_API_KEY=your_api_key_here
+```
+
+### Running the APP
+
+```
+uvicorn app.main:app --reload
+```
+
+API Docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+---
+
+### Frontend Setup
+
+```
+cd frontend
+
+npm install
+npm run dev
+```
+
+App runs on: [http://localhost:5173](http://localhost:5173)
+
+---
+
+## How It Works
+
+### Upload Document
+
+```
+POST /files/upload?ingest=true
+```
+
+- Saves PDF
+- Splits into chunks
+- Generates embeddings (OpenAI)
+- Stores in ChromaDB
+
+---
+
+### Ask Question
+
+```
+POST /query/
+```
+
+- Query is embedded
+- Top-k relevant chunks retrieved
+- OpenAI generates answer using context
+
+---
+
+### Response Format
+
+```
+{
+  "data": {
+    "answer": "...",
+    "sources": [...]
+  }
+}
+```
+
+---
+
+## Example Workflow
+
+1. Upload a PDF
+2. Ask: "Ask questions related to the pdf?"
+3. Get an answer grounded in the document
+
+---
+
 ## Troubleshooting
-No results / empty answers: verify you ran populate_data.py after adding files to Data/.
-Slow generation: switch to a smaller HF model or run with GPU.
-Vector store reset: delete the chroma/ folder and re-run ingestion.
-Model not found: run huggingface-cli login or ensure the model is public.
+
+### Reset Vector DB
+
+```
+rm -rf chroma
+```
+
+### Re-ingest documents
+
+```
+POST /files/ingest-all
+```
+
+### Common Issues
+
+- CORS errors → enable middleware in FastAPI
+- No results → ensure ingestion completed
+- API key errors → verify OpenAI key
 
 ---
-## Roadmap
-PDF/HTML loaders with clean text extraction
-Source highlighting in answers
-Eval harness for retrieval quality
-Simple API or Streamlit UI
-Caching, reranking, and better prompts
+
+## Future Improvements
+
+- File-based query filtering
+- Source highlighting in UI
+- Streaming responses
+- Docker deployment
+- Authentication
+- Evaluation metrics (RAGAS)
+
+---
+
+## Key Learnings
+
+- End-to-end RAG system design
+- Vector search with ChromaDB
+- FastAPI + React integration
+- OpenAI-powered LLM applications
+
+---
+
+## Author
+
+Samarth Subramani Nagarathna
+
+---
+
+## If you like this project
+
+Give it a star ⭐ and feel free to contribute!
+
